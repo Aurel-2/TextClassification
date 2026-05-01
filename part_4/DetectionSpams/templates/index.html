@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Détection de spam</title>
+</head>
+<body>
+
+<h2>Détection de spam</h2>
+<p>Sélectionnez un modèle :</p>
+<select id="model">
+    <option value="naive_bayes">Naive Bayes</option>
+    <option value="decision_tree">Decision Tree</option>
+    <option value="logistic_regression">Logistic Regression</option>
+</select><br>
+
+<p>Entrez un message à analyser :</p>
+
+<textarea id="text" rows="5" cols="50"></textarea><br><br>
+<button onclick="predict()">Prédire</button>
+
+<p id="result"></p>
+
+<script>
+function predict() {
+    let text = document.getElementById("text").value;
+    let model = document.getElementById("model").value;
+
+    fetch("/predict", {method: "POST",headers: {"Content-Type": "application/json"},body: JSON.stringify({text: text, model: model})}).then(res => res.json())
+    .then(data => {
+        let mots = data.explanation.join(", ");
+        document.getElementById("result").innerText =
+            "Modèle : " + data.model +
+            "\nPrédiction : " + (data.prediction === "spam" ? "Spam" : "Non spam") +
+            "\nMots importants : " + mots;
+    });
+}
+</script>
+</body>
+</html>
