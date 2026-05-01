@@ -72,5 +72,9 @@ def imdb_model():
     train_and_save_all(X_train_vec, X_test_vec, y_train, y_test, vectorizer, "imdb")
 
 if __name__ == "__main__":
+    print("Training and saving models...")
+    print("Spam models")
     spam_model()
+    print("IMDB models")
     imdb_model()
+    print("Done")
