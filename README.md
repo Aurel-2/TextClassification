@@ -1,55 +1,51 @@
 # Classification de texte
 
-Le but de ce projet est de travailler sur la classification de sentiments à partir du dataset IMDb et la détection de spam.
-## Prérequis
+Le but de ce projet est de travailler sur la classification de sentiments à partir du dataset IMDb, ainsi que sur la détection de spam.
 
-- Python 3.10+
+## Prérequis
+- Python 3.10 ou supérieur
+- uv
 
 ## Installation de uv
 
-Si vous n'avez pas encore `uv` installé, voici comment le faire :
+Si vous n'avez pas encore installé uv :
 
-### Sur Linux
-
+**Sur Linux**
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
-
-### Sur Windows
-
+**Sur Windows**
 ```bash
-powershell -ExecutionPolicy BypassUser -c "irm https://astral.sh/uv/install.ps1 | iex"
+powershell -ExecutionPolicy Bypass -Command "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 ## Installation du projet
 
-1. Cloner le repository :
-2. 
+Cloner le dépôt :
 ```bash
 git clone https://github.com/Aurel-2/TextClassification.git
-cd textclassification
+cd TextClassification
 ```
-Créer un environnement virtuel avec uv :
 
+### Environnement virtuel avec uv
+
+Création de l'environnement virtuel :
 ```bash
 uv venv
 ```
+Activer l'environnement virtuel :
 
-2. Activer l'environnement virtuel :
-
-Sur Linux :
-````bash
+**Sur Linux**
+```bash
 source .venv/bin/activate
-````
+```
 
-Sur Windows :
-````bash
+**Sur Windows**
+```bash
 .venv\Scripts\activate
-````
+```
 
-3. Installer les dépendances avec `uv` :
+### Installer les dépendances 
 ```bash
 uv sync
 ```
-
-
