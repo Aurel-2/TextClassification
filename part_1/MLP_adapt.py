@@ -1,12 +1,10 @@
-# VERSION MODIFIÉE DU CODE (ANTI-TRICHE)
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-#Chargement des données
+# Chargement des données
 USE_HF = False  # mettre True si datasets installé
 
 if USE_HF:
@@ -23,7 +21,6 @@ else:
     X_test = df2['text']
     y_test = df2['label']
 
-
 vectorizer = TfidfVectorizer(
     max_features=10000,
     ngram_range=(1, 2),
@@ -32,24 +29,22 @@ vectorizer = TfidfVectorizer(
     lowercase=True,
     stop_words='english'
 )
-
 X_train = vectorizer.fit_transform(X_train).toarray()
 X_test = vectorizer.transform(X_test).toarray()
 
-# Conversion en tenseurs
+# Tenseurs
 X_train = torch.tensor(X_train, dtype=torch.float32)
-y_train = torch.tensor(y_train, dtype=torch.float32).unsqueeze(1)
+y_train = torch.tensor(y_train, dtype=torch.long)
 
 X_test = torch.tensor(X_test, dtype=torch.float32)
-y_test = torch.tensor(y_test, dtype=torch.float32).unsqueeze(1)
+y_test = torch.tensor(y_test, dtype=torch.long)
 
-# DataLoader (batch)
-train_dataset = TensorDataset(X_train, y_train)
-test_dataset = TensorDataset(X_test, y_test)
-train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-test_loader = DataLoader(test_dataset, batch_size=16)
+# DataLoader
+train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=16, shuffle=True)
+test_loader = DataLoader(TensorDataset(X_test, y_test), batch_size=16)
 
-# Modèle MLP
+
+# Modèle
 class MLP(nn.Module):
     def __init__(self):
         super().__init__()
@@ -58,21 +53,20 @@ class MLP(nn.Module):
         self.dropout = nn.Dropout(0.3)
         self.fc2 = nn.Linear(256, 128)
         self.fc3 = nn.Linear(128, 64)
-        self.fc4 = nn.Linear(64, 1)
+        self.fc4 = nn.Linear(64, 2) # Deux classes
 
     def forward(self, x):
         x = torch.relu(self.bn1(self.fc1(x)))
         x = self.dropout(x)
         x = torch.relu(self.fc2(x))
         x = torch.relu(self.fc3(x))
-        x = self.fc4(x)  # BCEWithLogitsLoss => pas de sigmoid ici
-        return x
+        return self.fc4(x)
 
 model = MLP()
 
-# ====== Loss (MODIFIÉ) ======
-criterion = nn.BCEWithLogitsLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.00001)
+criterion = nn.CrossEntropyLoss() # BCEWithLogitsLoss
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
+
 
 # Entraînement
 def train():
@@ -84,6 +78,7 @@ def train():
             loss = criterion(outputs, y_batch)
             loss.backward()
             optimizer.step()
+
         print(f"Epoch {epoch+1}, Loss: {loss.item():.4f}")
 
 # Évaluation
@@ -91,14 +86,16 @@ def evaluate():
     model.eval()
     correct = 0
     total = 0
+
     with torch.no_grad():
         for X_batch, y_batch in test_loader:
-            outputs = torch.sigmoid(model(X_batch))
-            preds = (outputs > 0.5).float()
+            outputs = model(X_batch)
+            preds = outputs.argmax(dim=1)
             correct += (preds == y_batch).sum().item()
             total += y_batch.size(0)
+
     print("Accuracy:", correct / total)
 
-# ====== Run ======
+
 train()
 evaluate()
