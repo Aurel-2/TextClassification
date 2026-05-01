@@ -3,3 +3,6 @@
 
 # Fichiers pickle
 *.pkl
+
+# Fichiers Jetbrains
+.idea
